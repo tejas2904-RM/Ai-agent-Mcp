@@ -37,8 +37,8 @@ export function ApiUnavailable({
       <p className="mt-4 font-mono text-xs text-muted">API: {apiBase}</p>
       {showConfigHint && (
         <p className="mt-3 max-w-lg text-xs text-mixed">
-          Set <span className="font-mono">NEXT_PUBLIC_API_URL</span> in Vercel to your
-          Render API URL (e.g. https://groww-pulse-api.onrender.com).
+          Set <span className="font-mono">PULSE_API_URL</span> in Vercel to your Render
+          API URL (e.g. https://groww-pulse-api.onrender.com) and redeploy.
         </p>
       )}
     </div>

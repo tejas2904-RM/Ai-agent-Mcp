@@ -4,6 +4,7 @@
   "installCommand": "npm install",
   "outputDirectory": ".next",
   "env": {
+    "PULSE_API_URL": "https://groww-pulse-api.onrender.com",
     "NEXT_PUBLIC_API_URL": "https://groww-pulse-api.onrender.com"
   }
 }

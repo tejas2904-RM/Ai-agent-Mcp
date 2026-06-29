@@ -1,7 +1,6 @@
 import type { PulsePayload, RunSummary, WeekSummary } from "./types";
 import { resolveApiBaseUrl } from "./config";
-
-const API_BASE = resolveApiBaseUrl();
+import { connection } from "next/server";
 
 const API_TIMEOUT_MS = 30_000;
 
@@ -16,16 +15,20 @@ export class ApiError extends Error {
 }
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
+  // Ensure env vars are read at request time, not frozen from build.
+  await connection();
+
+  const apiBase = resolveApiBaseUrl();
   let response: Response;
 
   try {
-    response = await fetch(`${API_BASE}${path}`, {
+    response = await fetch(`${apiBase}${path}`, {
       ...init,
       headers: {
         Accept: "application/json",
         ...init?.headers,
       },
-      next: { revalidate: 3600 },
+      cache: "no-store",
       signal: AbortSignal.timeout(API_TIMEOUT_MS),
     });
   } catch (cause) {
@@ -52,7 +55,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function getApiBaseUrl(): string {
-  return API_BASE;
+  return resolveApiBaseUrl();
 }
 
 export async function fetchLatestPulse(): Promise<PulsePayload> {
