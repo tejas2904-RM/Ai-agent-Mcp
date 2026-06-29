@@ -28,12 +28,16 @@ export function ThemeCard({ theme }: ThemeCardProps) {
         </div>
         <div>
           <dt className="text-xs text-muted">Avg rating</dt>
-          <dd className="text-sm font-semibold text-heading">{theme.avg_rating.toFixed(1)}</dd>
+          <dd className="text-sm font-semibold text-heading">
+            {typeof theme.avg_rating === "number" ? theme.avg_rating.toFixed(1) : "—"}
+          </dd>
         </div>
         <div>
           <dt className="text-xs text-muted">Low ★ %</dt>
           <dd className="text-sm font-semibold text-heading">
-            {Math.round(theme.low_star_pct)}%
+            {typeof theme.low_star_pct === "number"
+              ? `${Math.round(theme.low_star_pct)}%`
+              : "—"}
           </dd>
         </div>
       </dl>

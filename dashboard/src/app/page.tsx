@@ -5,52 +5,53 @@ import { QuoteCard } from "@/components/QuoteCard";
 import { ActionList } from "@/components/ActionList";
 import { WeeklyNotePreview } from "@/components/WeeklyNotePreview";
 import { EmptyState } from "@/components/EmptyState";
-import { ApiError, fetchLatestPulse, fetchPulseForWeek, fetchWeeks } from "@/lib/api";
+import { ApiUnavailable } from "@/components/ApiUnavailable";
+import { loadPulsePage } from "@/lib/pulse-page";
 import type { WeekSummary } from "@/lib/types";
 
 interface PageProps {
   searchParams: Promise<{ week?: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage({ searchParams }: PageProps) {
   const { week } = await searchParams;
+  const result = await loadPulsePage(week);
 
-  let weeks: WeekSummary[];
-  try {
-    weeks = await fetchWeeks();
-  } catch {
-    weeks = [];
+  if (result.kind === "empty") {
+    return (
+      <PageShell weeks={result.weeks}>
+        <EmptyState
+          title="No pulse data yet"
+          description="Run the weekly pipeline or sync artifacts to the API. Once data is available, the latest weekly insights will appear here."
+          actionLabel="View run history"
+          actionHref="/runs"
+        />
+      </PageShell>
+    );
   }
 
-  let pulse;
-  try {
-    pulse = week ? await fetchPulseForWeek(week) : await fetchLatestPulse();
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 404) {
-      return (
-        <PageShell weeks={weeks}>
-          <EmptyState
-            title="No pulse data yet"
-            description="Run the weekly pipeline or sync artifacts to the API. Once data is available, the latest weekly insights will appear here."
-            actionLabel="View run history"
-            actionHref="/runs"
-          />
-        </PageShell>
-      );
-    }
-    throw error;
+  if (result.kind === "error") {
+    return (
+      <PageShell weeks={result.weeks}>
+        <ApiUnavailable description={result.message} apiBase={result.apiBase} />
+      </PageShell>
+    );
   }
 
+  const { pulse, weeks } = result;
   const currentWeek = weeks.find((w) => w.week_range === pulse.week_range);
   const runStatus = currentWeek?.status ?? "success";
+  const delivery = pulse.delivery ?? { document_url: null, draft_id: null };
 
   return (
     <PageShell
       weeks={weeks}
       currentWeek={pulse.week_range}
       status={runStatus}
-      documentUrl={pulse.delivery.document_url}
-      draftId={pulse.delivery.draft_id}
+      documentUrl={delivery.document_url}
+      draftId={delivery.draft_id}
     >
       <section className="mb-10">
         <p className="text-sm font-medium text-primary">{pulse.week_range}</p>
@@ -80,11 +81,15 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
       <section className="mb-10">
         <h2 className="mb-4 text-xl font-semibold text-heading">Top Themes</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {pulse.top_themes.map((theme) => (
-            <ThemeCard key={theme.rank} theme={theme} />
-          ))}
-        </div>
+        {pulse.top_themes.length === 0 ? (
+          <p className="text-sm text-muted">No themes available for this week.</p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {pulse.top_themes.map((theme) => (
+              <ThemeCard key={theme.rank} theme={theme} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="mb-10 grid gap-8 lg:grid-cols-2">
@@ -113,7 +118,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
 interface PageShellProps {
   children: React.ReactNode;
-  weeks?: Awaited<ReturnType<typeof fetchWeeks>>;
+  weeks?: WeekSummary[];
   currentWeek?: string;
   status?: string;
   documentUrl?: string | null;

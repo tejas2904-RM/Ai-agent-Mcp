@@ -5,29 +5,49 @@ const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").re
   "",
 );
 
+const API_TIMEOUT_MS = 30_000;
+
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-  ) {
+  status: number;
+
+  constructor(message: string, status: number) {
     super(message);
     this.name = "ApiError";
+    this.status = status;
   }
 }
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      Accept: "application/json",
-      ...init?.headers,
-    },
-    next: { revalidate: 3600 },
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers: {
+        Accept: "application/json",
+        ...init?.headers,
+      },
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(API_TIMEOUT_MS),
+    });
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "Failed to reach API";
+    throw new ApiError(message, 0);
+  }
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new ApiError(detail || `API error ${response.status}`, response.status);
+    let message = detail || `API error ${response.status}`;
+    try {
+      const body = JSON.parse(detail) as { detail?: unknown };
+      if (typeof body.detail === "string") {
+        message = body.detail;
+      }
+    } catch {
+      // keep raw text
+    }
+    throw new ApiError(message, response.status);
   }
 
   return response.json() as Promise<T>;

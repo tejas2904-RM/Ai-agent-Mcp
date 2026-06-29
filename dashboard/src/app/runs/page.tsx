@@ -2,15 +2,24 @@ import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { RunTimeline } from "@/components/RunTimeline";
 import { EmptyState } from "@/components/EmptyState";
-import { fetchRuns } from "@/lib/api";
+import { fetchRuns, getApiBaseUrl } from "@/lib/api";
 import type { RunSummary } from "@/lib/types";
+import { ApiUnavailable } from "@/components/ApiUnavailable";
+import { apiErrorMessage, isApiError } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 export default async function RunsPage() {
-  let runs: RunSummary[];
+  let runs: RunSummary[] = [];
+  let apiError: string | null = null;
+
   try {
     runs = await fetchRuns();
-  } catch {
-    runs = [];
+  } catch (error) {
+    const status = isApiError(error) ? error.status : 0;
+    if (status !== 404) {
+      apiError = apiErrorMessage(error, getApiBaseUrl());
+    }
   }
 
   return (
@@ -30,7 +39,9 @@ export default async function RunsPage() {
         </p>
 
         <div className="mt-8">
-          {runs.length === 0 ? (
+          {apiError ? (
+            <ApiUnavailable description={apiError} apiBase={getApiBaseUrl()} />
+          ) : runs.length === 0 ? (
             <EmptyState
               title="No runs recorded"
               description="Weekly pipeline runs will appear here once orchestration has completed at least once."
