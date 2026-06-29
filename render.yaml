@@ -9,13 +9,11 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
+      # Free tier has no persistent disk — artifacts are pushed after each weekly run
+      # via groww-pulse-phase9-sync (GitHub Actions) to POST /api/v1/admin/sync
       - key: API_DATA_DIR
-        value: /var/data/analysis
+        value: data/api
       - key: CORS_ORIGINS
         value: https://groww-pulse.vercel.app,http://localhost:3000
       - key: API_KEY
         sync: false
-    disk:
-      name: pulse-data
-      mountPath: /var/data
-      sizeGB: 1

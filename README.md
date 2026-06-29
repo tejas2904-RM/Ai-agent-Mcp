@@ -235,7 +235,7 @@ groww-pulse-api
 | GET | `/api/v1/runs/{run_id}` | Single run metadata |
 | POST | `/api/v1/admin/sync` | Upload artifacts (`X-API-Key`) |
 
-**Deploy on Render:** use `render.yaml` (Web Service + 1GB disk at `/var/data/analysis`).
+**Deploy on Render:** use `render.yaml` (free-tier Web Service; **no persistent disk** — weekly GitHub Actions sync pushes artifacts via `POST /api/v1/admin/sync`).
 
 **Sync artifacts after pipeline:**
 
