@@ -39,6 +39,7 @@ groww-pulse-phase7 = "groww_pulse.phase7.verify:main"
 groww-pulse-phase8 = "groww_pulse.phase8.verify:main"
 groww-pulse-phase9 = "groww_pulse.phase9.verify:main"
 groww-pulse-phase9-sync = "groww_pulse.phase9.sync_cli:main"
+groww-pulse-phase10 = "groww_pulse.phase10.verify:main"
 groww-pulse-api = "groww_pulse.phase9.server:main"
 
 [build-system]

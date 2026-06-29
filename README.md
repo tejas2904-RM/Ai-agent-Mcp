@@ -12,6 +12,7 @@ AI agent that turns **Groww (Stocks, Mutual Funds & Gold)** App Store and Play S
 │   ├── sample/             # Sample Groww review exports (Phase 0/1 input)
 │   └── normalized/         # Normalized review store (Phase 1 output)
 ├── docs/                   # Architecture, plan, eval, decisions
+├── dashboard/              # Phase 10 — Next.js insights dashboard (Vercel)
 ├── src/groww_pulse/        # Application source
 │   ├── mcp/                # MCP client, discovery, mock servers
 │   ├── phase0/             # Phase 0 verification
@@ -150,7 +151,7 @@ Requires Phase 1 output at `data/normalized/groww_reviews.json`.
 | 7 — Gmail Draft Delivery (MCP) | Implemented |
 | 8 — Orchestration & End-to-End | Implemented |
 | 9 — Backend API (Render) | Implemented |
-| 10 — Insights Dashboard (Vercel) | Planned |
+| 10 — Insights Dashboard (Vercel) | Implemented |
 
 ## Phase 8 — Orchestration & End-to-End
 
@@ -245,3 +246,38 @@ groww-pulse-phase9-sync --remote-url https://groww-pulse-api.onrender.com
 ```
 
 **Environment:** `API_DATA_DIR`, `CORS_ORIGINS`, `API_KEY` (see `.env.example`).
+
+## Phase 10 — Insights Dashboard (Vercel)
+
+Next.js App Router dashboard matching the approved Google Stitch mocks (`6374599666648079093`).
+
+```powershell
+cd dashboard
+copy .env.example .env.local
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). Point `NEXT_PUBLIC_API_URL` at a running Phase 9 API (local `groww-pulse-api` or Render).
+
+**Verify:**
+
+```powershell
+groww-pulse-phase10
+```
+
+**Deploy on Vercel:**
+
+1. Import the GitHub repo in Vercel.
+2. Set **Root Directory** to `dashboard`.
+3. Add environment variable `NEXT_PUBLIC_API_URL` → your Render API URL (e.g. `https://groww-pulse-api.onrender.com`).
+4. Add your Vercel production/preview URLs to `CORS_ORIGINS` on Render.
+
+**Routes:**
+
+| Route | Screen |
+|-------|--------|
+| `/` | Latest weekly pulse (themes, quotes, actions, note preview) |
+| `/runs` | Pipeline run timeline with filters |
+
+See `docs/google-stitch-frontend-prompts.md` for approved colour tokens and layout reference.

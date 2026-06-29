@@ -261,24 +261,57 @@ The product under analysis throughout is **Groww — Stocks, Mutual Funds & Gold
 
 ---
 
-## Phase 10 — Insights Dashboard Deployment (Vercel)
-**Goal:** Ship a **frontend dashboard** on **[Vercel](https://vercel.com)** that visualizes the weekly Groww Review Pulse — themes, quotes, action ideas, note preview, and links to the Google Doc / run history.
+## Phase 10 — Insights Dashboard (Next.js on Vercel)
+**Goal:** Ship a **Next.js** insights dashboard on **[Vercel](https://vercel.com)** that visualizes the weekly Groww Review Pulse — themes, quotes, action ideas, note preview, and links to the Google Doc / run history.
+
+**Frontend principle:** **Next.js** (App Router) is the **mandated** frontend stack for this project — not a generic React SPA. Vercel is the deployment target; Next.js is the framework.
+
+**Approved UI reference (Google Stitch):** The visual design is **locked** to two Stitch screens in project `6374599666648079093`. Implementation must match these mocks and the colour scheme below — do not invent a new palette or layout.
+
+| Screen | Stitch path | Next.js route | Purpose |
+|--------|-------------|---------------|---------|
+| Main dashboard | `screens/490cfa088c134c2abffc140c5a3f829a` | `app/page.tsx` | Latest weekly pulse |
+| Run history | `screens/08cd0bc5260a44d0879ea6c766c2fd1d` | `app/runs/page.tsx` | Pipeline run timeline |
+
+Stitch project: `web application/stitch/projects/6374599666648079093` · Prompt source: `docs/google-stitch-frontend-prompts.md`
+
+**Approved colour scheme & design tokens**
+
+| Token | Hex | Usage |
+|-------|-----|--------|
+| Background | `#F8FAFC` | Page canvas (off-white) |
+| Surface / card | `#FFFFFF` | Theme cards, quote blocks, note preview |
+| Border | `#E2E8F0` | Card borders, dividers |
+| Primary accent | `#00B386` | CTAs, active nav, success status, primary buttons |
+| Heading / nav | `#0F172A` | Titles, wordmark, primary text |
+| Text secondary | `#64748B` | Labels, metadata, captions |
+| Text muted | `#94A3B8` | Timestamps, helper text |
+| Negative sentiment | `#EF4444` | Low-star %, severity bars, failed runs |
+| Mixed sentiment | `#F59E0B` | Mixed-sentiment badges |
+| Positive sentiment | `#10B981` | Success badges, positive signals |
+
+- **Typography:** Inter (or equivalent geometric sans) — 32px bold hero, 20px semibold section titles, 14px body, 12px captions.
+- **Cards:** 12px radius, 1px `#E2E8F0` border, shadow `0 1px 3px rgba(15,23,42,0.08)`.
+- **Buttons:** 8px radius; primary filled `#00B386`; secondary outline slate.
+- **Badges:** Pill shape — volume `HIGH` / `MEDIUM` / `LOW`; sentiment `NEGATIVE` / `MIXED` / `POSITIVE`.
 
 **What we are doing**
-- Build a **dashboard UI** (e.g. Next.js — Vercel-native) that consumes the Phase 9 Render API.
-- Key views: **latest weekly pulse**, **top 3 themes** with severity/volume signals, **user quotes**, **action ideas**, **run timeline** (from `run_history.json` shape), and outbound links (Google Doc, Gmail draft metadata).
+- Scaffold a **Next.js** app (App Router, TypeScript) under `dashboard/` that **pixel-matches the approved Stitch screens** and consumes the Phase 9 Render API.
+- **Main dashboard screen** (`490cfa08…`): top nav (logo + week selector + Doc/Gmail links + success pill), hero with review metadata, **bento grid of 3 theme cards** (rank, volume/sentiment badges, stats), two-column **User Quotes** + **Action Ideas**, collapsible **weekly note preview** (≤250 words).
+- **Run history screen** (`08cd0bc5…`): breadcrumb, filter chips (All / Success / Failed / Skipped delivery), vertical **timeline cards** per run (run ID, week range, status badge, timestamps, delivery links, mini stats).
+- Use **Server Components** for initial data fetch; **Client Components** for week selector, filters, and loading states.
+- Add **loading / error / empty** states consistent with the same Stitch palette (see `google-stitch-frontend-prompts.md` Prompt 4).
 - Configure **Vercel environment variables** (`NEXT_PUBLIC_API_URL` → Render backend, optional auth token).
-- Enable **preview deployments** per PR and a **production** deployment on merge to main.
-- Ensure responsive layout, loading/error states, and empty-state when no run exists yet.
-- Keep the dashboard **read-only** — no pipeline triggers from the UI in v1 unless explicitly added later.
+- Enable **preview deployments** per PR and **production** on merge to main.
+- Keep the dashboard **read-only** — no pipeline triggers from the UI in v1.
 
-**Why it matters:** Docs and Gmail drafts reach operators in their tools; the dashboard gives product and leadership a scannable, shareable view of insights in the browser.
+**Why it matters:** Docs and Gmail drafts reach operators in their tools; the Stitch-approved Next.js dashboard gives product and leadership a scannable, on-brand weekly pulse in the browser.
 
-**Produces:** a live Vercel URL (e.g. `https://groww-pulse.vercel.app`) connected to the Render API.
+**Produces:** a live Vercel URL (e.g. `https://groww-pulse.vercel.app`) — Next.js app matching Stitch mocks, connected to the Render API.
 
 **Depends on:** Phase 9 (backend API live and CORS-enabled).
 
-**Risks / watch-outs:** API URL hardcoded incorrectly across environments; rendering PII if API contract drifts; broken dashboard when backend cold-starts; preview vs production pointing at different backends.
+**Risks / watch-outs:** deviating from approved Stitch colour scheme; API URL misconfigured across environments; rendering PII if API contract drifts; backend cold-start on Render free tier; preview vs production pointing at different APIs.
 
 ---
 
@@ -295,6 +328,6 @@ The product under analysis throughout is **Groww — Stocks, Mutual Funds & Gold
 | 7     | Gmail Draft Delivery (MCP)    | Gmail draft (to self/alias)                  |
 | 8     | Orchestration & End-to-End    | Repeatable weekly workflow + GitHub Actions (Mon 9:00 AM IST) |
 | 9     | Backend API (Render)          | HTTPS API for PII-safe insights + run metadata |
-| 10    | Insights Dashboard (Vercel)   | Browser dashboard wired to Render API        |
+| 10    | Insights Dashboard (Next.js / Vercel) | Stitch-approved UI + Next.js dashboard on Render API |
 
-> Note: note-generation is now its own phase (Phase 5) and Docs/Gmail are split into Phases 6 and 7 for clearer ownership and testing. Phases 9–10 add production **deployment** (Render backend + Vercel frontend). Exit criteria per phase are in `eval.md`; rationale for key choices is in `decision.md`.
+> Note: note-generation is now its own phase (Phase 5) and Docs/Gmail are split into Phases 6 and 7 for clearer ownership and testing. Phases 9–10 add production **deployment** (Render backend + **Next.js** frontend on Vercel). Exit criteria per phase are in `eval.md`; rationale for key choices is in `decision.md`.

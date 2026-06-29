@@ -30,3 +30,8 @@ data/analysis/
 data/api/
 data/normalized/
 data/scrubbed/
+
+# Next.js dashboard
+dashboard/node_modules/
+dashboard/.next/
+dashboard/.env.local

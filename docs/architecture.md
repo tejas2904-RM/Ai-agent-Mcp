@@ -3,7 +3,7 @@
 ## 1. Purpose
 An AI agent that imports recent **App Store + Play Store reviews of Groww (Stocks, Mutual Funds & Gold)**, groups them into themes, generates a one-page weekly pulse (top 3 themes, 3 real quotes, 3 action ideas, ≤250 words, no PII), writes it to **Google Docs**, creates a **Gmail draft**, and surfaces insights in a **browser dashboard** — all Google interactions go through **MCP servers**, not raw Google REST APIs.
 
-The system is designed as a **pipeline of well-bounded stages** orchestrated by an MCP-aware agent, with a **Render-hosted API** and **Vercel-hosted dashboard** for production read access. Each stage has a single responsibility, a clear input/output contract, and a corresponding quality gate (see `eval.md`). This keeps the workflow auditable, testable, and easy to re-run weekly.
+The system is designed as a **pipeline of well-bounded stages** orchestrated by an MCP-aware agent, with a **Render-hosted API** and a **Next.js dashboard on Vercel** for production read access. Each stage has a single responsibility, a clear input/output contract, and a corresponding quality gate (see `eval.md`). This keeps the workflow auditable, testable, and easy to re-run weekly.
 
 ## 2. Design Principles
 - **Tool-driven integration:** the agent reaches Google Docs and Gmail only through MCP tools, never provider SDKs/REST. This decouples business logic from vendor APIs and keeps the agent portable.
@@ -11,6 +11,7 @@ The system is designed as a **pipeline of well-bounded stages** orchestrated by 
 - **Deterministic boundaries, probabilistic core:** ingestion, filtering, validation, and delivery are deterministic; only theming and note-writing rely on the LLM, and their outputs are validated by deterministic checks.
 - **Idempotent weekly runs:** a run for a given week produces one Doc and one draft; re-running is safe and overwrites/labels rather than duplicating uncontrollably.
 - **Fail visible, fail safe:** every stage validates its inputs and surfaces clear errors; the Gmail step only ever creates a *draft* (never auto-sends).
+- **Next.js for the dashboard:** Phase 10 uses **Next.js** (App Router) on Vercel as the sole frontend framework — visual design follows **approved Google Stitch mocks** (project `6374599666648079093`), not ad-hoc styling.
 
 ## 3. High-Level Architecture
 
@@ -33,7 +34,7 @@ flowchart TD
     N -. doc link .-> M
     K --> P[(Analysis Artifacts<br/>themes / insights / run log)]
     P --> Q[Backend API<br/>Render Web Service]
-    Q --> R[Insights Dashboard<br/>Vercel]
+    Q --> R[Next.js Dashboard<br/>Vercel]
 ```
 
 ## 4. Logical Layers
@@ -42,7 +43,7 @@ flowchart TD
 3. **Guardrail Layer** — deterministic validation of constraints (≤250 words, no PII, exactly 3+3+3, ≤5 themes).
 4. **Integration Layer** — MCP client + Google Docs/Gmail MCP servers (hosted on Render).
 5. **Orchestration Layer** — sequences stages, manages retries, logging, run metadata, and **GitHub Actions** weekly scheduling (Monday 9:00 AM IST).
-6. **Presentation Layer** — **Render** backend API + **Vercel** insights dashboard for read-only access to weekly pulse outputs.
+6. **Presentation Layer** — **Render** backend API + **Next.js** insights dashboard on **Vercel** for read-only access to weekly pulse outputs.
 
 ## 5. Components
 
@@ -164,13 +165,36 @@ flowchart LR
 - **Security:** CORS locked to Vercel dashboard origin(s); optional API key header for non-public deployments.
 - **Ops:** health check path for Render auto-restart; env vars for `CORS_ORIGINS`, storage paths, and secrets; document cold-start behavior on free/starter tiers.
 
-### 5.14 Insights Dashboard — Vercel (Phase 10)
-- **Platform:** [Vercel](https://vercel.com) (Next.js or React SPA).
-- **Role:** stakeholder-facing **insights dashboard** — latest pulse, theme cards, quotes, action ideas, run timeline, outbound Doc link.
-- **Data:** fetches from Phase 9 Render API via `NEXT_PUBLIC_API_URL` (and optional auth token).
-- **Views:** latest week hero, top-3 themes with volume/sentiment badges, quote blocks, action list, historical runs dropdown.
-- **Deploy:** production on `main`; preview URLs per PR; environment-specific API base URLs (preview → staging API if used).
-- **Constraints:** read-only v1; no PII fields rendered; graceful empty/loading/error states when API or weekly run is unavailable.
+### 5.14 Insights Dashboard — Next.js on Vercel (Phase 10)
+- **Framework:** **[Next.js](https://nextjs.org/)** (App Router, TypeScript) on [Vercel](https://vercel.com).
+- **Visual source of truth:** **Google Stitch** project `6374599666648079093` — implementation must match these approved screens and colour scheme:
+
+| Screen ID | Route | Layout summary |
+|-----------|-------|----------------|
+| `490cfa088c134c2abffc140c5a3f829a` | `/` | Main dashboard — nav, hero, 3 theme bento cards, quotes + actions columns, note preview |
+| `08cd0bc5260a44d0879ea6c766c2fd1d` | `/runs` | Run history — filters, vertical timeline cards, run metadata |
+
+- **Colour scheme (mandatory tokens):**
+
+| Role | Hex |
+|------|-----|
+| Background | `#F8FAFC` |
+| Card surface | `#FFFFFF` |
+| Border | `#E2E8F0` |
+| Primary accent (CTA, success) | `#00B386` |
+| Headings / primary text | `#0F172A` |
+| Secondary text | `#64748B` |
+| Muted text | `#94A3B8` |
+| Negative / severity | `#EF4444` |
+| Mixed sentiment | `#F59E0B` |
+| Positive sentiment | `#10B981` |
+
+- **Typography:** Inter — 32px hero, 20px section titles, 14px body, 12px captions.
+- **Components:** 12px card radius, 8px button radius, pill badges for volume/sentiment, soft card shadow.
+- **Data:** Phase 9 Render API via `NEXT_PUBLIC_API_URL`; Server Components for initial fetch; Client Components for week selector and run filters.
+- **Project layout:** `dashboard/` Next.js app; shared TypeScript types mirroring `GET /api/v1/pulse/latest` and `GET /api/v1/runs`.
+- **Deploy:** Vercel production on `main`; preview per PR; `CORS_ORIGINS` on Render must include the Vercel domain.
+- **Constraints:** read-only v1; no PII rendered; loading/error/empty states use the same palette (see `docs/google-stitch-frontend-prompts.md`).
 
 ```mermaid
 flowchart LR
@@ -178,7 +202,7 @@ flowchart LR
         O[Orchestrator] --> Artifacts[(Analysis JSON)]
     end
     Artifacts -->|sync / upload| API[Render Backend API]
-    subgraph Vercel["Vercel"]
+    subgraph Vercel["Vercel — Next.js"]
         UI[Insights Dashboard]
     end
     UI -->|HTTPS GET| API
@@ -205,7 +229,7 @@ flowchart LR
 11. Via MCP: create the Gmail draft to self/alias (including the Doc link).
 12. Persist run log and upload workflow artifacts (GitHub Actions).
 13. Sync PII-safe artifacts to the **Render backend** store (Phase 9).
-14. **Vercel dashboard** reads latest pulse and run history from the Render API (Phase 10).
+14. **Next.js dashboard** on Vercel reads latest pulse and run history from the Render API (Phase 10).
 
 ## 8. Internal Review Schema
 | Field   | Type   | Notes                              |
@@ -238,7 +262,7 @@ flowchart LR
 ## 12. Observability
 - **Run log:** counts (imported, kept after window, scrubbed), selected themes, artifact links (Doc URL, draft ID), and pass/fail of each guardrail.
 - **Traceability:** every quote in the note is traceable back to a source (scrubbed) review.
-- **Dashboard (Phase 10):** Vercel UI surfaces latest run status, theme summaries, and historical weeks via the Render API — complements Gmail/Docs delivery for in-browser monitoring.
+- **Dashboard (Phase 10):** Next.js UI on Vercel surfaces latest run status, theme summaries, and historical weeks via the Render API — complements Gmail/Docs delivery for in-browser monitoring.
 
 ## 13. Technology Choices (summary)
 - **Language/Runtime:** Python 3.11+ (see `decision.md` ADR-006).
@@ -247,7 +271,7 @@ flowchart LR
 - **Storage:** JSON file stores for normalized, scrubbed, and analysis outputs.
 - **Scheduling (Phase 8):** **GitHub Actions** — weekly cron every **Monday 9:00 AM IST** (`30 3 * * 1` UTC); `workflow_dispatch` for manual runs; repository secrets for API keys and delivery targets.
 - **Backend (Phase 9):** **Render** Web Service — REST API exposing PII-safe insights and run metadata; CORS for Vercel origin.
-- **Frontend (Phase 10):** **Vercel** — insights dashboard (Next.js recommended); `NEXT_PUBLIC_API_URL` points at Render backend.
+- **Frontend (Phase 10):** **Next.js** (App Router) on **Vercel** — UI matches **Google Stitch** project `6374599666648079093` (teal `#00B386` accent, `#F8FAFC` background); `NEXT_PUBLIC_API_URL` → Render backend.
 
 ## 14. Groq LLM Strategy (Phase 3–5)
 
