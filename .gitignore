@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# Environment & secrets
+.env
+credentials.json
+token.json
+*.pem
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project runtime
+logs/
+*.log
+.pytest_cache/
+data/analysis/
+data/api/
+data/normalized/
+data/scrubbed/

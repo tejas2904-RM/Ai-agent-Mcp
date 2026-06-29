@@ -1,0 +1,7 @@
+Star Rating,Review Title,Review Text,Review Submit Date and Time
+5,Easy SIP setup,Monthly SIP for index fund was seamless.,2026-05-01
+4,Portfolio view,Holdings screen is clear and updated quickly.,2026-05-15
+,bad row missing rating,This row should be skipped.,2026-05-20
+3,,Review with no title but valid text body here.,2026-06-01
+5,Duplicate test,Exact duplicate for dedup testing.,2026-06-10
+5,Duplicate test,Exact duplicate for dedup testing.,2026-06-10

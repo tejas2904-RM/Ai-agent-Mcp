@@ -1,0 +1,14 @@
+[
+  {
+    "star_rating": "5",
+    "review_title": "JSON export works",
+    "review_text": "Parsed from JSON with alternate field names.",
+    "review_date": "2026-06-15"
+  },
+  {
+    "star_rating": "invalid",
+    "review_title": "Bad rating",
+    "review_text": "Should be skipped.",
+    "review_date": "2026-06-15"
+  }
+]

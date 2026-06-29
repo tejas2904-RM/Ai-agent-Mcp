@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "google-docs": {
+      "transport": "stdio",
+      "command": "python",
+      "args": ["-m", "groww_pulse.mcp.servers.mock_docs"],
+      "required_tools": ["docs_create", "docs_append"],
+      "tool_aliases": {
+        "docs_create": ["create_file"],
+        "docs_append": ["docs_insert", "read_file_content"]
+      }
+    },
+    "gmail": {
+      "transport": "stdio",
+      "command": "python",
+      "args": ["-m", "groww_pulse.mcp.servers.mock_gmail"],
+      "required_tools": ["gmail_draft_create"],
+      "tool_aliases": {
+        "gmail_draft_create": ["create_draft"]
+      }
+    }
+  }
+}

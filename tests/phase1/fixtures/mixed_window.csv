@@ -1,0 +1,3 @@
+Rating,Title,Review,Date
+4,Old review,This review is outside the recency window.,2020-01-15
+5,Recent review,This one should be kept in the window.,2026-06-01

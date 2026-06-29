@@ -1,0 +1,53 @@
+[project]
+name = "groww-review-pulse"
+version = "0.1.0"
+description = "Groww weekly review pulse AI agent with MCP integrations"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.9.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "google-play-scraper>=1.2.0",
+    "langdetect>=1.0.9",
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+api = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-multipart>=0.0.9",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+]
+
+[project.scripts]
+groww-pulse = "groww_pulse.cli:main"
+groww-pulse-phase0 = "groww_pulse.phase0.verify:main"
+groww-pulse-phase1 = "groww_pulse.phase1.verify:main"
+groww-pulse-phase1-run = "groww_pulse.phase1.run:main"
+groww-pulse-phase2 = "groww_pulse.phase2.verify:main"
+groww-pulse-phase3 = "groww_pulse.phase3.verify:main"
+groww-pulse-phase4 = "groww_pulse.phase4.verify:main"
+groww-pulse-phase5 = "groww_pulse.phase5.verify:main"
+groww-pulse-phase6 = "groww_pulse.phase6.verify:main"
+groww-pulse-phase7 = "groww_pulse.phase7.verify:main"
+groww-pulse-phase8 = "groww_pulse.phase8.verify:main"
+groww-pulse-phase9 = "groww_pulse.phase9.verify:main"
+groww-pulse-phase9-sync = "groww_pulse.phase9.sync_cli:main"
+groww-pulse-api = "groww_pulse.phase9.server:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

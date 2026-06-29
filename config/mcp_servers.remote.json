@@ -1,0 +1,21 @@
+{
+  "_comment": "Saksham Google MCP REST server — https://github.com/tejas2904-RM/MCP",
+  "mcpServers": {
+    "google-docs": {
+      "transport": "http",
+      "url": "https://saksham-mcp-server-i1js.onrender.com",
+      "required_tools": ["append_to_doc"],
+      "tool_aliases": {
+        "append_to_doc": ["docs_append"]
+      }
+    },
+    "gmail": {
+      "transport": "http",
+      "url": "https://saksham-mcp-server-i1js.onrender.com",
+      "required_tools": ["create_email_draft"],
+      "tool_aliases": {
+        "create_email_draft": ["gmail_draft_create", "create_draft"]
+      }
+    }
+  }
+}
