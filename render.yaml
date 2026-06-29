@@ -14,6 +14,6 @@ services:
       - key: API_DATA_DIR
         value: data/api
       - key: CORS_ORIGINS
-        value: https://groww-pulse.vercel.app,http://localhost:3000
+        value: https://groww-pulse.vercel.app,https://ai-agent-mcp.vercel.app,https://ai-agent-mcp-tejas2904-rm.vercel.app,http://localhost:3000
       - key: API_KEY
         sync: false

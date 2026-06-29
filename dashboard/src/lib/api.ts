@@ -1,9 +1,7 @@
 import type { PulsePayload, RunSummary, WeekSummary } from "./types";
+import { resolveApiBaseUrl } from "./config";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(
-  /\/$/,
-  "",
-);
+const API_BASE = resolveApiBaseUrl();
 
 const API_TIMEOUT_MS = 30_000;
 
