@@ -38,7 +38,7 @@ export function ApiUnavailable({
       {showConfigHint && (
         <p className="mt-3 max-w-lg text-xs text-mixed">
           Set <span className="font-mono">PULSE_API_URL</span> in Vercel to your Render
-          API URL (e.g. https://groww-pulse-api.onrender.com) and redeploy.
+          API URL (e.g. https://groww-pulse-api-uss6.onrender.com) and redeploy.
         </p>
       )}
     </div>

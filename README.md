@@ -242,7 +242,7 @@ groww-pulse-api
 
 ```powershell
 groww-pulse-phase9-sync
-groww-pulse-phase9-sync --remote-url https://groww-pulse-api.onrender.com
+groww-pulse-phase9-sync --remote-url https://groww-pulse-api-uss6.onrender.com
 ```
 
 **Environment:** `API_DATA_DIR`, `CORS_ORIGINS`, `API_KEY` (see `.env.example`).
@@ -270,7 +270,7 @@ groww-pulse-phase10
 
 1. Import the GitHub repo in Vercel.
 2. Set **Root Directory** to `dashboard`.
-3. Add environment variable `NEXT_PUBLIC_API_URL` → your Render API URL (e.g. `https://groww-pulse-api.onrender.com`).
+3. Add environment variable `NEXT_PUBLIC_API_URL` → your Render API URL (e.g. `https://groww-pulse-api-uss6.onrender.com`).
 4. Add your Vercel production/preview URLs to `CORS_ORIGINS` on Render.
 
 **Routes:**

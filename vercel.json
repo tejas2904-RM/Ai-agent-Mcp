@@ -6,7 +6,7 @@
   "outputDirectory": "dashboard/.next",
   "framework": "nextjs",
   "env": {
-    "PULSE_API_URL": "https://groww-pulse-api.onrender.com",
-    "NEXT_PUBLIC_API_URL": "https://groww-pulse-api.onrender.com"
+    "PULSE_API_URL": "https://groww-pulse-api-uss6.onrender.com",
+    "NEXT_PUBLIC_API_URL": "https://groww-pulse-api-uss6.onrender.com"
   }
 }

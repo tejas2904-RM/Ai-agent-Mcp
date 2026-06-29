@@ -1,5 +1,5 @@
 /** Production Render API — matches `render.yaml` service `groww-pulse-api`. */
-export const PRODUCTION_API_URL = "https://groww-pulse-api.onrender.com";
+export const PRODUCTION_API_URL = "https://groww-pulse-api-uss6.onrender.com";
 
 const LOCAL_API_URL = "http://localhost:8000";
 

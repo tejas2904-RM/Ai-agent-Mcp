@@ -253,7 +253,7 @@ The product under analysis throughout is **Groww — Stocks, Mutual Funds & Gold
 
 **Why it matters:** The weekly pipeline runs on a schedule; stakeholders need a stable HTTPS endpoint to fetch the latest insights without cloning the repo or reading local `data/` files.
 
-**Produces:** a live Render backend URL (e.g. `https://groww-pulse-api.onrender.com`) serving PII-safe insight payloads.
+**Produces:** a live Render backend URL (e.g. `https://groww-pulse-api-uss6.onrender.com`) serving PII-safe insight payloads.
 
 **Depends on:** Phases 3–8 (analysis artifacts and run log schema).
 

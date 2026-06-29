@@ -12,7 +12,7 @@ npm run dev
 
 Ensure the Phase 9 API is running (`groww-pulse-api` from the repo root). Local dev uses `PULSE_API_URL=http://localhost:8000` in `.env.local`.
 
-**Vercel:** set `PULSE_API_URL` to your Render URL (or rely on the built-in default `https://groww-pulse-api.onrender.com`). Do **not** set `NEXT_PUBLIC_API_URL` to `localhost` on Vercel — it is baked in at build time.
+**Vercel:** set `PULSE_API_URL` to your Render URL (or rely on the built-in default `https://groww-pulse-api-uss6.onrender.com`). Do **not** set `NEXT_PUBLIC_API_URL` to `localhost` on Vercel — it is baked in at build time.
 
 ## Vercel deployment
 
